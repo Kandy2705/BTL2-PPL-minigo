@@ -1,0 +1,3 @@
+Program([
+			ArrayCell(ArrayCell(Id("a"),IntLiteral(2)),IntLiteral(3))
+		])

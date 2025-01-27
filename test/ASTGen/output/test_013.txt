@@ -1,0 +1,3 @@
+Program([
+			CallExpr(None,Id("foo"),[])
+		])

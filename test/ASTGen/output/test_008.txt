@@ -1,0 +1,4 @@
+Program([
+			CallExpr(None,Id("a"),[]),
+			CallExpr(Id("b"),Id("a"),[IntLiteral(2),IntLiteral(3)])
+		])

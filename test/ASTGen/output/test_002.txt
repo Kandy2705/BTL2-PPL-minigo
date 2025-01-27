@@ -1,0 +1,7 @@
+Program([
+			FloatLiteral(1.0),
+			BooleanLiteral(True),
+			BooleanLiteral(False),
+			NilLiteral(),
+			StringLiteral("votien")
+		])
