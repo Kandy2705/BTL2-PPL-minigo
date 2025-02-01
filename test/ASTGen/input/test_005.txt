@@ -1,1 +1,1 @@
-a > b <= c
+const VoTien = foo( a > b <= c ); 

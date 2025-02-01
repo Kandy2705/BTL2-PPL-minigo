@@ -24,9 +24,11 @@ options{
 	language = Python3;
 }
 
-program: (NEWLINE* (array_literal | struct_literal | func_call | global_variable
+program: (NEWLINE* list_declaration NEWLINE*)* EOF; // day
+
+list_declaration: (array_literal | struct_literal | func_call | global_variable
              | global_constant | function | struct_type | initialize_struct
-            | interface_type | struct_func) NEWLINE*)* EOF; // day
+            | interface_type | struct_func) ;
 
 // program: NEWLINE* func_call_thamso EOF;
 
@@ -38,17 +40,19 @@ initialize_struct: ID COLONASSIGN ((ID list_expr) | (INT_DEC | INT_BIN | INT_OCT
 
 interface_type: TYPE ID INTERFACE LBRACE NEWLINE* data_inter NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
 data_inter: (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)) data_inter | ; 
-initialize_inter: ID LPAREN (data_inter_thamso | ) RPAREN;
-data_inter_thamso: (ID (type_data | )) COMMA data_inter_thamso | (ID (type_data | ));
+initialize_inter: ID LPAREN (list_interface | ) (type_data | ) RPAREN;
+list_interface: data_inter_thamso_list COMMA list_interface | data_inter_thamso_list;
+data_inter_thamso_list: data_inter_thamso type_data;
+data_inter_thamso: ID  COMMA data_inter_thamso | ID ;
 
-global_variable: VAR ID ((type_data ((ASSIGN (expr)) | )) | (ASSIGN (expr))) SEMICOLON NEWLINE*;
+global_variable: VAR ID ((type_data ((ASSIGN (expr)) | )) | (ASSIGN (expr))) SEMICOLON;
 local_variable: VAR ID ((type_data ((ASSIGN (expr)) | )) | (ASSIGN (expr)));
 
-global_constant: CONST ID ASSIGN (expr) SEMICOLON NEWLINE*;
+global_constant: CONST ID ASSIGN (expr) SEMICOLON;
 local_constant: CONST ID ASSIGN (expr);
 
 
-function: FUNC ID LPAREN (data_func | ) RPAREN (list_type_arr | ) (type_data | ) LBRACE NEWLINE* body_func NEWLINE* RBRACE;
+function: FUNC ID LPAREN (data_func | ) RPAREN (type_data | ) LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 data_func: (ID type_data) COMMA data_func | (ID type_data);
 body_func: ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
                 | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)) body_func | ; //day
@@ -70,7 +74,8 @@ for_basic: FOR expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 for_icu: FOR (initialize_struct | local_variable) SEMICOLON expr SEMICOLON assignment_func LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 for_range: FOR (ID | '_') COMMA ID COLONASSIGN RANGE expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 
-struct_func: FUNC LPAREN ID ID RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE;
+struct_func: FUNC LPAREN method RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE;
+method: (ID type_data) COMMA method | (ID type_data);
 func_call_str: ID LPAREN (func_call_thamso_str |  ) RPAREN;
 func_call_thamso_str: (ID type_data) COMMA func_call_thamso_str | (ID type_data);
 

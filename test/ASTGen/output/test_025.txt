@@ -1,0 +1,4 @@
+Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				])
+		])

@@ -1,1 +1,1 @@
-a(),b.a(2, 3)
+const VoTien = foo( a(),b.a(2, 3) ); 

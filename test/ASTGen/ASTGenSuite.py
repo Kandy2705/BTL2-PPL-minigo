@@ -135,3 +135,132 @@ class ASTGenSuite(unittest.TestCase):
 			InterfaceDecl(Id("Votien"),[FunctionDecl(Id("Add"), IntType(), None,[VariablesDecl(Id("x"), IntType(), None),VariablesDecl(Id("y"), IntType(), None)], [])])
 		])
         self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_018(self):
+        input = """
+            func votien() {
+                var a int;
+                const a = nil;
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				VariablesDecl(Id("a"), IntType(), None),
+				ConstDecl(Id("a"),NilLiteral())])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_019(self):
+        input = """
+            func votien() {
+                a += 1;
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				AssignStmt(Id("a"),"+=",IntLiteral(1))])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_020(self):
+        input = """
+            func votien() {
+                break;
+                continue;
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				Break(),
+                Continue()])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_021(self):
+        input = """
+            func votien() {
+                if(1) {}
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				If(IntLiteral(1), [], None, None)])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_022(self):
+        input = """
+            func votien() {
+                if(1) {
+                    a := 1;
+                }
+                else {
+                    a := 1;
+                }
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				If(IntLiteral(1), [AssignStmt(Id("a"),":=",IntLiteral(1))], None, [AssignStmt(Id("a"),":=",IntLiteral(1))])])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_023(self):
+        input = """
+            func votien() {
+                if(1) {
+                }else if(1) {
+                    a := 1;
+                }else if(2) {
+                }
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				If(IntLiteral(1), [], [
+                    (IntLiteral(1),[AssignStmt(Id("a"),":=",IntLiteral(1))]), 
+                    (IntLiteral(2),[])]
+                    , None)])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+
+    def test_024(self):
+        input = """
+            func votien() {
+                for i < 10 {}
+                for var i = 0; i < 10; i += 1  {}
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				For(None,BinaryOp("<",Id("i"),IntLiteral(10)),None,[]),
+				For(VariablesDecl(Id("i"), None, IntLiteral(0)),BinaryOp("<",Id("i"),IntLiteral(10)),AssignStmt(Id("i"),"+=",IntLiteral(1)),[])])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_025(self):
+        input = """
+            func votien() {
+                for index, value := range array[2] {}
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				For(Id("index"),Id("value"),ArrayCell(Id("array"),IntLiteral(2)),[])])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_026(self):
+        input = """
+            func votien() {
+                foo(1, 2);
+                a[2].foo(1,3);
+            }
+"""
+        expect = Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				CallStmt(None,Id("foo"),[IntLiteral(1),IntLiteral(2)]),
+				CallStmt(ArrayCell(Id("a"),IntLiteral(2)),Id("foo"),[IntLiteral(1),IntLiteral(3)])])
+		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))

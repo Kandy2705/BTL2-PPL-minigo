@@ -1,0 +1,4 @@
+Program([
+			FunctionDecl(Id("foo"), VoidType(), VariablesDecl(Id("Votien"), ClassType(Id("v")), None),[VariablesDecl(Id("Votien"), IntType(), None)],[
+				])
+		])

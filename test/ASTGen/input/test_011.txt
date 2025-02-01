@@ -1,1 +1,1 @@
-[1]int{1}, [1][1]int{2}
+const VoTien = foo( [1]int{1}, [1][1]int{2} ); 

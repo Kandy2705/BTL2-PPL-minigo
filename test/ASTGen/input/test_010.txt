@@ -1,1 +1,1 @@
-Votien {}, Votien {a: 1}
+const VoTien = foo( Votien {}, Votien {a: 1} ); 
