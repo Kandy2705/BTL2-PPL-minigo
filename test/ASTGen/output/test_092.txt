@@ -1,0 +1,5 @@
+Program([
+			FunctionDecl(Id("foo"), VoidType(), None,[],[
+				Return(None),
+				Return(BinaryOp("+",CallExpr(None,Id("foo"),[]),IntLiteral(2)))])
+		])

@@ -1,0 +1,7 @@
+Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				CallStmt(None,Id("foo"),[IntLiteral(1),IntLiteral(2)]),
+				CallStmt(ArrayCell(Id("a"),IntLiteral(2)),Id("foo"),[IntLiteral(1),IntLiteral(3)]),
+				CallStmt(None,None,[Id("x"),Id("y")])]),
+			CallExpr(None,Id("foo"),[])
+		])

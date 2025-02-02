@@ -1,0 +1,4 @@
+Program([
+			FunctionDecl(Id("votien"), VoidType(), None,[],[
+				For(Id("index"),Id("value"),ArrayLiteral(IntType(), [2], value=[IntLiteral(1), IntLiteral(2)]),[Return(None), Return(IntLiteral(1))])])
+		])

@@ -27,7 +27,7 @@ options{
 program: (NEWLINE* list_declaration NEWLINE*)* EOF; // day
 
 list_declaration: (array_literal | struct_literal | func_call | global_variable
-             | global_constant | function | struct_type | initialize_struct
+             | global_constant | function | struct_type //| initialize_struct
             | interface_type | struct_func) ;
 
 // program: NEWLINE* func_call_thamso EOF;
@@ -36,7 +36,7 @@ list_declaration: (array_literal | struct_literal | func_call | global_variable
 
 struct_type: TYPE ID STRUCT LBRACE NEWLINE* data_struct NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
 data_struct: (ID type_data (SEMICOLON NEWLINE* | NEWLINE+)) data_struct | ;
-initialize_struct: ID COLONASSIGN ((ID list_expr) | (INT_DEC | INT_BIN | INT_OCT | INT_HEX));
+// initialize_struct: ID COLONASSIGN ((ID list_expr) | (INT_DEC | INT_BIN | INT_OCT | INT_HEX));
 
 interface_type: TYPE ID INTERFACE LBRACE NEWLINE* data_inter NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
 data_inter: (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)) data_inter | ; 
@@ -59,7 +59,7 @@ body_func: ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_
 
 assignment_func: (ID | ID arr_index | ID (list_arr_index | ) dot_assignment)
              (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
-             expr) | );
+             expr));
 dot_assignment: DOT (ID | (ID list_type_arr)) dot_assignment | DOT (ID | (ID list_type_arr));
 list_arr_index: arr_index list_arr_index | arr_index;
 arr_index: LBRACKET expr RBRACKET;
@@ -71,8 +71,8 @@ if_else: IF  LPAREN  expr  RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RB
 else_if: (ELSE IF  LPAREN expr RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE) else_if | (ELSE IF  LPAREN expr RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE);
 
 for_basic: FOR expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
-for_icu: FOR (initialize_struct | local_variable) SEMICOLON expr SEMICOLON assignment_func LBRACE NEWLINE* body_func NEWLINE* RBRACE;
-for_range: FOR (ID | '_') COMMA ID COLONASSIGN RANGE expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
+for_icu: FOR (assignment_func | local_variable) SEMICOLON expr SEMICOLON assignment_func LBRACE NEWLINE* body_func NEWLINE* RBRACE;
+for_range: FOR ID COMMA ID COLONASSIGN RANGE expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 
 struct_func: FUNC LPAREN method RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE;
 method: (ID type_data) COMMA method | (ID type_data);
@@ -83,7 +83,7 @@ array_literal: type_array list_expr;
 type_array: list_type_arr (type_data);
 list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET);
 list_expr: LBRACE data_list_expr RBRACE;
-data_list_expr: (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | LBRACE expr RBRACE | list_expr) COMMA data_list_expr | (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | LBRACE expr RBRACE | list_expr);
+data_list_expr: (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | LBRACE expr RBRACE | list_expr | expr) COMMA data_list_expr | (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | LBRACE expr RBRACE | list_expr | expr);
 type_data: ID | INT | FLOAT | BOOLEAN | STRING | type_array;
 
 struct_literal: ID LBRACE (list_elements | ) RBRACE;
@@ -101,7 +101,7 @@ expr7: ID | INT_DEC | INT_BIN | INT_OCT | INT_HEX | FLOAT_LIT | LPAREN expr RPAR
         func_call | STRING_LIT | struct_literal | array_literal | TRUE | FALSE | NIL;
 
 // func_call: ((ID (list_arr_index | ) DOT) | ) ID LPAREN (func_call_thamso |  ) RPAREN;
-call_statement: ((ID (list_arr_index | ) DOT) | ) ID LPAREN (func_call_thamso |  ) RPAREN;
+call_statement: ID (list_arr_index | ) dot_assignment LPAREN (func_call_thamso |  ) RPAREN;
 func_call: ID LPAREN (func_call_thamso |  ) RPAREN;
 func_call_thamso: expr COMMA func_call_thamso | expr;
 

@@ -125,6 +125,16 @@ class BooleanLiteral(Literal):
     value:bool
     def __str__(self):
         return "BooleanLiteral(" + str(self.value) + ")"
+    
+@dataclass
+class ArrayType(Type):
+    typ : Type
+    dimensions : list[int]
+    def __str__(self):
+        return (f"ArrayType({self.typ}, "
+                f"{self.dimensions})")
+
+
 @dataclass
 class ArrayLiteral(Literal):
     typ : Type
@@ -263,6 +273,7 @@ class StructDecl(Declared):
     fields: List[VariablesDecl]
     def __str__(self):
         return "StructDecl(" + str(self.name) +  ",[" +  ','.join(str(i) for i in self.fields) + "])"
+    
 
 
 # used for whole program

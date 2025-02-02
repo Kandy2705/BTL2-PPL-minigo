@@ -1,4 +1,4 @@
 Program([
 			FunctionDecl(Id("votien"), VoidType(), None,[],[
-				])
+				AssignStmt(Id("a"),"+=",IntLiteral(1))])
 		])

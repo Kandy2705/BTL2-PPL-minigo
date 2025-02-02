@@ -1,0 +1,3 @@
+Program([
+			ConstDecl(Id("a"),BinaryOp("-",BinaryOp("+",IntLiteral(1),UnaryOp("-",IntLiteral(2))),IntLiteral(1)))
+		])

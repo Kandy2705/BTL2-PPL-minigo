@@ -333,3 +333,8 @@ class ParserSuite(unittest.TestCase):
                                         a[2][3].foo(2 + 3, a {a:2})
                                     }""","successful", inspect.stack()[0].function))
         
+    def test_150(self):
+        """Statement"""
+        self.assertTrue(TestParser.test("""
+            const a = [1]ID{Votien{}};
+""","successful", inspect.stack()[0].function))

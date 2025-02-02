@@ -65,7 +65,7 @@ class ASTGenSuite(unittest.TestCase):
 
     def test_011(self):
         input = """const VoTien = foo( [1]int{1}, [1][1]int{2} ); """
-        expect = Program([ConstDecl(Id("VoTien"),CallExpr(None,Id("foo"),[ArrayLiteral(IntType(), [], value=[IntLiteral(1)]),ArrayLiteral(IntType(), [1], value=[IntLiteral(2)])]))])
+        expect = Program([ConstDecl(Id("VoTien"),CallExpr(None,Id("foo"),[ArrayLiteral(IntType(), [1], value=[IntLiteral(1)]),ArrayLiteral(IntType(), [1, 1], value=[IntLiteral(2)])]))])
         self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
 
     def test_012(self):
@@ -263,4 +263,74 @@ class ASTGenSuite(unittest.TestCase):
 				CallStmt(None,Id("foo"),[IntLiteral(1),IntLiteral(2)]),
 				CallStmt(ArrayCell(Id("a"),IntLiteral(2)),Id("foo"),[IntLiteral(1),IntLiteral(3)])])
 		])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+        
+    def test_030(self):
+        input = """
+            const a = 1 + -2 - 1;
+"""
+        expect = Program([
+            ConstDecl(Id("a"),BinaryOp("-",BinaryOp("+",IntLiteral(1),UnaryOp("-",IntLiteral(2))),IntLiteral(1)))
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+        
+    def test_031(self):
+        input = """
+            const a = [1]ID{Votien{}};
+"""
+        expect = Program([
+            ConstDecl(Id("a"),ArrayLiteral(ClassType(Id("ID")), [1], [StructLiteral(Id("Votien"), [])]))
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+        
+    def test_058(self):
+        "thêm type array vào AST anh có thông bao trong nhóm task 3"
+        input = """
+            var a [2][3]int;
+"""
+        expect = Program([
+            VariablesDecl(Id("a"), ArrayType(IntType(), [2, 3]), None)
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_070(self):
+        input = """
+            type Votien interface {
+
+            }
+"""
+        expect = Program([
+            InterfaceDecl(Id("Votien"),[])
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))    
+    
+    def test_092(self):
+        input = """
+            func foo(){
+                return;
+                return foo() + 2;
+            } 
+"""
+        expect = Program([
+            FunctionDecl(Id("foo"), VoidType(), None,[],[
+                Return(None),
+                Return(BinaryOp("+",CallExpr(None,Id("foo"),[]),IntLiteral(2)))])
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+        
+    def test_098(self):
+        input = """
+            func votien() {
+                for index, value := range [2]int{1,2} {
+                     return;
+                    return 1;
+                }
+            }
+"""
+        expect = Program([
+            FunctionDecl(Id("votien"), VoidType(), None,[],[
+                For(Id("index"),Id("value"),ArrayLiteral(IntType(), [2], [IntLiteral(1), IntLiteral(2)]),[Return(None), Return(IntLiteral(1))])])
+        ])
+        
         self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
