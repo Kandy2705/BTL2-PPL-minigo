@@ -57,10 +57,10 @@ data_func: (ID type_data) COMMA data_func | (ID type_data);
 body_func: ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
                 | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)) body_func | ; //day
 
-assignment_func: (ID | ID arr_index | ID (list_arr_index | ) dot_assignment)
+assignment_func: (dot)
              (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
              expr));
-dot_assignment: DOT (ID | (ID list_type_arr)) dot_assignment | DOT (ID | (ID list_type_arr));
+dot: dot (DOT ID | LBRACKET expr RBRACKET) | ID;          
 list_arr_index: arr_index list_arr_index | arr_index;
 arr_index: LBRACKET expr RBRACKET;
 
@@ -101,7 +101,7 @@ expr7: ID | INT_DEC | INT_BIN | INT_OCT | INT_HEX | FLOAT_LIT | LPAREN expr RPAR
         func_call | STRING_LIT | struct_literal | array_literal | TRUE | FALSE | NIL;
 
 // func_call: ((ID (list_arr_index | ) DOT) | ) ID LPAREN (func_call_thamso |  ) RPAREN;
-call_statement: ID (list_arr_index | ) dot_assignment LPAREN (func_call_thamso |  ) RPAREN;
+call_statement: dot DOT ID LPAREN (func_call_thamso |  ) RPAREN;
 func_call: ID LPAREN (func_call_thamso |  ) RPAREN;
 func_call_thamso: expr COMMA func_call_thamso | expr;
 

@@ -1,0 +1,7 @@
+Program([
+			FunctionDecl(Id("foo"), VoidType(), None,[],[
+				CallStmt(None,Id("foo"),[]),
+				CallStmt(None,Id("foo"),[CallExpr(None,Id("foo"),[]),IntLiteral(2)]),
+				CallStmt(Id("a"),Id("foo"),[]),
+				CallStmt(FieldAccess(ArrayCell(Id("a"),IntLiteral(2)),Id("c")),Id("foo"),[CallExpr(None,Id("foo"),[]),IntLiteral(2)])])
+		])

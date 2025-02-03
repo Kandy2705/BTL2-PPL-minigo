@@ -1,0 +1,4 @@
+Program([
+			FunctionDecl(Id("foo"), VoidType(), None,[],[
+				AssignStmt(ArrayCell(ArrayCell(Id("a"),StringLiteral("s")),CallExpr(None,Id("foo"),[])),":=",IntLiteral(1))])
+		])

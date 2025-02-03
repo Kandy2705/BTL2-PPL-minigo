@@ -265,37 +265,29 @@ class ASTGeneration(MiniGoVisitor):
 
     # Visit a parse tree produced by MiniGoParser#assignment_func.
     def visitAssignment_func(self, ctx:MiniGoParser.Assignment_funcContext):
-        if ctx.arr_index():
-            assign = ctx.getChild(2).getText()
-            lhs = ArrayCell(Id(ctx.ID().getText()), self.visit(ctx.arr_index()))
-
-        elif ctx.dot_assignment():
-            if ctx.list_arr_index():
-                assign = ctx.getChild(3).getText()
-                lhs = FieldAccess(ArrayCell(Id(ctx.ID().getText()), self.visit(ctx.list_arr_index())), self.visit(ctx.dot_assignment()))
-            else:
-                assign = ctx.getChild(2).getText()
-                lhs = FieldAccess(Id(ctx.ID().getText()), self.visit(ctx.dot_assignment()))
-        else:
-            lhs = Id(ctx.ID().getText())
-            assign = ctx.getChild(1).getText()
+        assign = ctx.getChild(1).getText()
+        lhs = self.visit(ctx.dot())
 
         exp = self.visit(ctx.expr())
 
         return AssignStmt(lhs, assign, exp)
 
 
-    # Visit a parse tree produced by MiniGoParser#dot_assignment.
-    def visitDot_assignment(self, ctx:MiniGoParser.Dot_assignmentContext):
-        if ctx.list_type_arr():
-            lhs = ArrayCell(Id(ctx.ID().getText()), self.visit(ctx.list_type_arr()))
-        else:
-            lhs = Id(ctx.ID().getText())
 
-        if ctx.dot_assignment():
-            return FieldAccess(lhs, self.visit(ctx.dot_assignment()))
+    # Visit a parse tree produced by MiniGoParser#dot.
+    def visitDot(self, ctx:MiniGoParser.DotContext):
+        if (ctx.getChildCount() == 1):
+            return Id(ctx.ID().getText())
+        lhs = self.visit(ctx.getChild(0))
+        rhs = None
         
-        return lhs
+        if ctx.LBRACKET():
+            rhs = self.visit(ctx.getChild(2))
+            return ArrayCell(lhs, rhs)
+        else:
+            rhs = Id(ctx.getChild(2).getText())
+            return FieldAccess(lhs, rhs)
+    
             
 
 
@@ -368,8 +360,8 @@ class ASTGeneration(MiniGoVisitor):
             initStmt = self.visit(ctx.local_variable())
             postStmt = self.visit(ctx.assignment_func()[0])
         else:
-            initStmt = self.visit(ctx.assignment_func(0)[0]) 
-            postStmt = self.visit(ctx.assignment_func(1)[0])
+            initStmt = self.visit(ctx.assignment_func(0)) 
+            postStmt = self.visit(ctx.assignment_func(1))
         
         
         return For(initStmt=initStmt, expr=expr, postStmt=postStmt, loop=loop)
@@ -672,23 +664,10 @@ class ASTGeneration(MiniGoVisitor):
     # Visit a parse tree produced by MiniGoParser#call_statement.
 
     def visitCall_statement(self, ctx:MiniGoParser.Call_statementContext):
-        args = self.visit(ctx.func_call_thamso()) if ctx.func_call_thamso() else []
-        method = Id(ctx.ID().getText())
-        obj = self.visit(ctx.dot_assignment()) if ctx.dot_assignment() else None
-
-        if isinstance(obj, FieldAccess):
-            method = obj.fieldname  
-            obj = obj.obj  
-
-        temp = None
-        temp2 = None
-
-        if ctx.list_arr_index():
-            indices = self.visit(ctx.list_arr_index())
-            temp = ArrayCell(method, indices[0]) 
-            temp2 = obj
-        
-        return CallStmt(temp, temp2, args)
+        name = Id(ctx.ID().getText())
+        param = self.visit(ctx.func_call_thamso()) if ctx.func_call_thamso() else []
+        obj = self.visit(ctx.dot())
+        return CallStmt(obj, name, param)
 
 
     # Visit a parse tree produced by MiniGoParser#func_call.

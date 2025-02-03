@@ -1,0 +1,4 @@
+Program([
+			FunctionDecl(Id("foo"), VoidType(), None,[],[
+				AssignStmt(ArrayCell(Id("a"),BinaryOp("+",IntLiteral(1),IntLiteral(1))),":=",IntLiteral(1))])
+		])

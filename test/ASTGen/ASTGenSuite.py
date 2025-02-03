@@ -305,6 +305,18 @@ class ASTGenSuite(unittest.TestCase):
         ])
         self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))    
     
+    def test_087(self):
+        input = """
+            func foo(){
+                a[2].b.c[2] := 1;
+            } 
+"""
+        expect = Program([
+            FunctionDecl(Id("foo"), VoidType(), None,[],[
+                AssignStmt(ArrayCell(FieldAccess(FieldAccess(ArrayCell(Id("a"),IntLiteral(2)),Id("b")),Id("c")),IntLiteral(2)),":=",IntLiteral(1))])
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
     def test_092(self):
         input = """
             func foo(){
@@ -333,4 +345,66 @@ class ASTGenSuite(unittest.TestCase):
                 For(Id("index"),Id("value"),ArrayLiteral(IntType(), [2], [IntLiteral(1), IntLiteral(2)]),[Return(None), Return(IntLiteral(1))])])
         ])
         
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_086(self):
+        input = """
+            func foo(){
+                a[1 + 1] := 1;
+            } 
+"""
+        expect = Program([
+            FunctionDecl(Id("foo"), VoidType(), None,[],[
+                AssignStmt(ArrayCell(Id("a"),BinaryOp("+",IntLiteral(1),IntLiteral(1))),":=",IntLiteral(1))])
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_088(self):
+        input = """
+            func foo(){
+                a["s"][foo()] := 1;
+            } 
+"""
+        expect = Program([
+            FunctionDecl(Id("foo"), VoidType(), None,[],[
+                AssignStmt(ArrayCell(ArrayCell(Id("a"),StringLiteral("s")),CallExpr(None,Id("foo"),[])),":=",IntLiteral(1))])
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_093(self):
+        input = """
+            func foo(){
+                foo();
+                foo(foo(), 2);
+                a.foo();
+                a[2].c.foo(foo(), 2);
+            } 
+"""
+        expect = Program([
+            FunctionDecl(Id("foo"), VoidType(), None,[],[
+                CallStmt(None,Id("foo"),[]),
+                CallStmt(None,Id("foo"),[CallExpr(None,Id("foo"),[]),IntLiteral(2)]),
+                CallStmt(Id("a"),Id("foo"),[]),
+                CallStmt(FieldAccess(ArrayCell(Id("a"),IntLiteral(2)),Id("c")),Id("foo"),[CallExpr(None,Id("foo"),[]),IntLiteral(2)])])
+        ])
+        self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
+
+    def test_097(self):
+        input = """
+            func votien() {
+                for i[8] {
+                    return;
+                    return 1;
+                }
+                for i[2] := 0; i[1] < 10; i[3] += 1  {
+                    return;
+                    return 1;
+                }
+            }
+"""
+        expect = Program([
+            FunctionDecl(Id("votien"), VoidType(), None,[],[
+                For(None,ArrayCell(Id("i"),IntLiteral(8)),None,[Return(None), Return(IntLiteral(1))]),
+                For(AssignStmt(ArrayCell(Id("i"),IntLiteral(2)),":=",IntLiteral(0)),BinaryOp("<",ArrayCell(Id("i"),IntLiteral(1)),IntLiteral(10)),AssignStmt(ArrayCell(Id("i"),IntLiteral(3)),"+=",IntLiteral(1)),[Return(None), Return(IntLiteral(1))])])
+        ])
         self.assertTrue(TestAST.test(input, str(expect), inspect.stack()[0].function))
