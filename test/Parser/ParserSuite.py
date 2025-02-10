@@ -410,7 +410,23 @@ class ParserSuite(unittest.TestCase):
         self.assertTrue(TestParser.test("""
             func (c int) Add(x int) int {return ;}
 ""","Error on line 2 col 20: int", inspect.stack()[0].function))
-    
+    def test_071(self):
+        """Declared"""
+        self.assertTrue(TestParser.test("""    
+            func Add(a) [2]id {return ;}
+""","Error on line 2 col 22: )", inspect.stack()[0].function))
+    def test_075(self):
+        """Declared"""
+        self.assertTrue(TestParser.test("""    
+            type Calculator struct {value int}
+""","Error on line 2 col 45: }", inspect.stack()[0].function))
+
+    def test_099(self):
+        """Declared"""
+        self.assertTrue(TestParser.test("""
+
+""","Error on line 3 col 0: <EOF>", inspect.stack()[0].function))
+            
     def test_091(self):
         """Declared"""
         self.assertTrue(TestParser.test("""
@@ -438,7 +454,14 @@ class ParserSuite(unittest.TestCase):
         """array_literal"""
         self.assertTrue(TestParser.test("""const a = [1]int{[1]int{1}}                    
 ""","Error on line 1 col 17: [", inspect.stack()[0].function))
-        
+    def test_155(self):
+        """array_literal"""
+        self.assertTrue(TestParser.test("""const a = [1]int{{1, 0x1}, ID{}, 1.2, "s", true, false, nil} + nil                    
+""","successful", inspect.stack()[0].function))
+    def test_156(self):
+        self.assertTrue(TestParser.test("""
+        func Add(x, y int, b float) {return ;}           
+""","successful", inspect.stack()[0].function))
     def test_158(self):
         self.assertTrue(TestParser.test("""
         type Person struct {

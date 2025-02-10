@@ -102,3 +102,9 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.test("""
             nil
 """, "nil,;,<EOF>", inspect.stack()[0].function))
+
+    def test_099(self):
+            """Declared"""
+            self.assertTrue(TestLexer.test("""
+
+    """," <EOF>", inspect.stack()[0].function))

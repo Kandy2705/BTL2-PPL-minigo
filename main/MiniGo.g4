@@ -30,22 +30,22 @@ options{
 	language = Python3;
 }
 
-program: (NEWLINE* list_declaration NEWLINE*)* EOF; // day
+program: (list_declaration)+ EOF; // day
 
 list_declaration: (array_literal | struct_literal | func_call | global_variable
-             | global_constant | function | struct_type //| initialize_struct
+             | global_constant | function | struct_type
             | interface_type | struct_func) ;
 
 // program: NEWLINE* func_call_thamso EOF;
 
 //TODO: PARSE
 
-struct_type: TYPE ID STRUCT LBRACE NEWLINE* data_struct NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
-data_struct: (ID type_data (SEMICOLON NEWLINE* | NEWLINE+) | struct_func) data_struct | (ID type_data (SEMICOLON NEWLINE* | NEWLINE+) | struct_func);//sua day
+struct_type: TYPE ID STRUCT LBRACE data_struct RBRACE (SEMICOLON);
+data_struct: (ID type_data (SEMICOLON) | struct_func) data_struct | (ID type_data (SEMICOLON) | struct_func);//sua day
 // initialize_struct: ID COLONASSIGN ((ID list_expr) | (INT_DEC | INT_BIN | INT_OCT | INT_HEX));
 
-interface_type: TYPE ID INTERFACE LBRACE NEWLINE* data_inter NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
-data_inter: (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)) data_inter | (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)); //sua day
+interface_type: TYPE ID INTERFACE LBRACE  data_inter  RBRACE (SEMICOLON);
+data_inter: (initialize_inter (type_data | ) (SEMICOLON)) data_inter | (initialize_inter (type_data | ) (SEMICOLON)); //sua day
 initialize_inter: ID LPAREN (list_interface | ) (type_data | ) RPAREN;
 list_interface: data_inter_thamso_list COMMA list_interface | data_inter_thamso_list;
 data_inter_thamso_list: data_inter_thamso type_data;
@@ -58,11 +58,11 @@ global_constant: CONST ID ASSIGN (expr) SEMICOLON;
 local_constant: CONST ID ASSIGN (expr);
 
 
-function: FUNC ID LPAREN (data_func | ) RPAREN (type_data | ) LBRACE NEWLINE* body_func NEWLINE* RBRACE SEMICOLON;
+function: FUNC func_call_str (type_data | ) LBRACE  body_func  RBRACE SEMICOLON; //sua day
 data_func: (ID type_data) COMMA data_func | (ID type_data);
 body_func: ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
-                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)) body_func | ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
-                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)); //sua day
+                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON)) body_func | ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
+                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON)); //sua day
 
 assignment_func: (dot)
              (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
@@ -72,25 +72,25 @@ list_arr_index: arr_index list_arr_index | arr_index;
 arr_index: LBRACKET expr RBRACKET;
 
 
-if_else: IF  LPAREN  expr  RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE NEWLINE* 
-        (else_if | ) NEWLINE* (ELSE NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE | );
+if_else: IF  LPAREN  expr  RPAREN  LBRACE  body_func  RBRACE  
+        (else_if | )  (ELSE  LBRACE  body_func  RBRACE | );
 
-else_if: (ELSE IF  LPAREN expr RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE) else_if | (ELSE IF  LPAREN expr RPAREN NEWLINE* LBRACE NEWLINE* body_func NEWLINE* RBRACE);
+else_if: (ELSE IF  LPAREN expr RPAREN  LBRACE  body_func  RBRACE) else_if | (ELSE IF  LPAREN expr RPAREN  LBRACE  body_func  RBRACE);
 
-for_basic: FOR expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
-for_icu: FOR (assignment_func | local_variable) SEMICOLON expr SEMICOLON assignment_func LBRACE NEWLINE* body_func NEWLINE* RBRACE;
-for_range: FOR ID COMMA ID COLONASSIGN RANGE expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
+for_basic: FOR expr LBRACE  body_func  RBRACE;
+for_icu: FOR (assignment_func | local_variable) SEMICOLON expr SEMICOLON assignment_func LBRACE  body_func  RBRACE;
+for_range: FOR ID COMMA ID COLONASSIGN RANGE expr LBRACE  body_func  RBRACE;
 
 struct_func: FUNC LPAREN method RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE SEMICOLON;
 method: (ID ID) COMMA method | (ID ID); //sua day
 func_call_str: ID LPAREN (func_call_thamso_str |  ) RPAREN;
-func_call_thamso_str: (ID (type_data | )) COMMA func_call_thamso_str | (ID (type_data | )); //sua day
+func_call_thamso_str: (ID (type_data | )) COMMA func_call_thamso_str | (ID type_data); //sua day
 
 array_literal: type_array list_expr;
 type_array: list_type_arr (type_data);
 list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET);
 list_expr: LBRACE data_list_expr RBRACE;
-data_list_expr: (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr) COMMA data_list_expr | (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr); //sua day
+data_list_expr: (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr) COMMA data_list_expr | (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr); //sua day
 type_data: ID | INT | FLOAT | BOOLEAN | STRING | type_array;
 
 struct_literal: ID LBRACE (list_elements | ) RBRACE;
@@ -198,7 +198,7 @@ BOOLEAN_LIT: TRUE | FALSE;
 
 //TODO skip 3.1 and 3.2 pdf
 
-NEWLINE   : ('\n')+ {
+NEWLINE   : ('\r'? '\n')+ {
     if self.prevtoken is not None and self.prevtoken.type in {
         self.ID, self.RPAREN, self.RBRACKET, self.RBRACE,
         self.INT_DEC, self.INT_BIN, self.INT_OCT, self.INT_HEX,
@@ -208,14 +208,13 @@ NEWLINE   : ('\n')+ {
     }:
         self.text = ";"
         self.type = self.SEMICOLON
-        return self.emit()
         
     else:
         self.skip()
         
 };
 
-WS: [ \t\f\r]+ -> skip; // skip spaces, tabs 
+WS: [ \t\f\r]+ -> skip;
 COMMENTS: '/*' (COMMENTS|.)*? '*/' -> skip;
 COMMENTS_LINE: '//' ~[\r\n]* -> skip;
 
