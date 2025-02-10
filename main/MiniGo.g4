@@ -5,19 +5,25 @@ from lexererr import *
 }
 
 @lexer::members {
+prevtoken = None
 def emit(self):
     tk = self.type
     if tk == self.UNCLOSE_STRING:       
         result = super().emit();
+        self.prevtoken = result;
         raise UncloseString(result.text);
     elif tk == self.ILLEGAL_ESCAPE:
         result = super().emit();
+        self.prevtoken = result;
         raise IllegalEscape(result.text);
     elif tk == self.ERROR_CHAR:
         result = super().emit();
+        self.prevtoken = result;
         raise ErrorToken(result.text); 
     else:
-        return super().emit();
+        result = super().emit()
+        self.prevtoken = result
+        return result
 }
 
 options{
@@ -35,11 +41,11 @@ list_declaration: (array_literal | struct_literal | func_call | global_variable
 //TODO: PARSE
 
 struct_type: TYPE ID STRUCT LBRACE NEWLINE* data_struct NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
-data_struct: (ID type_data (SEMICOLON NEWLINE* | NEWLINE+)) data_struct | ;
+data_struct: (ID type_data (SEMICOLON NEWLINE* | NEWLINE+) | struct_func) data_struct | (ID type_data (SEMICOLON NEWLINE* | NEWLINE+) | struct_func);//sua day
 // initialize_struct: ID COLONASSIGN ((ID list_expr) | (INT_DEC | INT_BIN | INT_OCT | INT_HEX));
 
 interface_type: TYPE ID INTERFACE LBRACE NEWLINE* data_inter NEWLINE* RBRACE (SEMICOLON NEWLINE* | NEWLINE+);
-data_inter: (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)) data_inter | ; 
+data_inter: (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)) data_inter | (initialize_inter (type_data | ) (SEMICOLON NEWLINE* | NEWLINE+)); //sua day
 initialize_inter: ID LPAREN (list_interface | ) (type_data | ) RPAREN;
 list_interface: data_inter_thamso_list COMMA list_interface | data_inter_thamso_list;
 data_inter_thamso_list: data_inter_thamso type_data;
@@ -52,10 +58,11 @@ global_constant: CONST ID ASSIGN (expr) SEMICOLON;
 local_constant: CONST ID ASSIGN (expr);
 
 
-function: FUNC ID LPAREN (data_func | ) RPAREN (type_data | ) LBRACE NEWLINE* body_func NEWLINE* RBRACE;
+function: FUNC ID LPAREN (data_func | ) RPAREN (type_data | ) LBRACE NEWLINE* body_func NEWLINE* RBRACE SEMICOLON;
 data_func: (ID type_data) COMMA data_func | (ID type_data);
 body_func: ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
-                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)) body_func | ; //day
+                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)) body_func | ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
+                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON NEWLINE* | NEWLINE+)); //sua day
 
 assignment_func: (dot)
              (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
@@ -74,16 +81,16 @@ for_basic: FOR expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 for_icu: FOR (assignment_func | local_variable) SEMICOLON expr SEMICOLON assignment_func LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 for_range: FOR ID COMMA ID COLONASSIGN RANGE expr LBRACE NEWLINE* body_func NEWLINE* RBRACE;
 
-struct_func: FUNC LPAREN method RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE;
-method: (ID type_data) COMMA method | (ID type_data);
+struct_func: FUNC LPAREN method RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE SEMICOLON;
+method: (ID ID) COMMA method | (ID ID); //sua day
 func_call_str: ID LPAREN (func_call_thamso_str |  ) RPAREN;
-func_call_thamso_str: (ID type_data) COMMA func_call_thamso_str | (ID type_data);
+func_call_thamso_str: (ID (type_data | )) COMMA func_call_thamso_str | (ID (type_data | )); //sua day
 
 array_literal: type_array list_expr;
 type_array: list_type_arr (type_data);
 list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET);
 list_expr: LBRACE data_list_expr RBRACE;
-data_list_expr: (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | LBRACE expr RBRACE | list_expr | expr) COMMA data_list_expr | (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | LBRACE expr RBRACE | list_expr | expr);
+data_list_expr: (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr) COMMA data_list_expr | (FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr); //sua day
 type_data: ID | INT | FLOAT | BOOLEAN | STRING | type_array;
 
 struct_literal: ID LBRACE (list_elements | ) RBRACE;
@@ -173,35 +180,16 @@ COMMA: ',';
 ID: [a-zA-Z_][a-zA-Z0-9_]*;
 
 //TODO Literals 3.3.5 pdf
-FLOAT_LIT: INT_DEC DOT [0-9]* ([eE][+-]?INT_DEC)?;
+FLOAT_LIT: [0]* INT_DEC DOT [0-9]* ([eE][+-]? [0]* INT_DEC)?;
 //INTEGER_LIT: INT_DEC | INT_BIN | INT_OCT | INT_HEX;
-INT_DEC: [0-9] | [1-9][0-9]+{
-    self.text = str(int(self.text, 10))
-};
-INT_BIN: [0] [bB] [0-1]+{
-    self.text = str(int(self.text, 2))
-};
-INT_OCT: [0] [oO] [0-7]+{
-    self.text = str(int(self.text, 8))
-};
-INT_HEX: [0] [xX] [0-9a-fA-F]+{
-    self.text = str(int(self.text, 16))
-};
+INT_DEC: ([0-9] | [1-9][0-9]+);
+INT_BIN: [0] [bB] [0-1]+;
+INT_OCT: [0] [oO] [0-7]+;
+INT_HEX: [0] [xX] [0-9a-fA-F]+;
 STRING_LIT: '"' STR_CHAR* '"'{
     self.text = self.text[1:-1]};
 fragment STR_CHAR: ESC_SEQ | ~[\r\n\\"];
 fragment ESC_SEQ: '\\' [trn"\\];
-// INTERPRETED_STRING_LIT : '"' (~["\\] | ESCAPED_VALUE)* '"';
-
-// fragment ESCAPED_VALUE:
-//     '\\' (
-//         'u' INT_HEX INT_HEX INT_HEX INT_HEX
-//         | 'U' INT_HEX INT_HEX INT_HEX INT_HEX INT_HEX INT_HEX INT_HEX INT_HEX
-//         | [abfnrtv\\'"]
-//         | INT_OCT INT_OCT INT_OCT
-//         | 'x' INT_HEX INT_HEX
-//     )
-// ;
 
 fragment ESC_ILLEGAL: '\\' ~[trn"\\];
 
@@ -210,10 +198,26 @@ BOOLEAN_LIT: TRUE | FALSE;
 
 //TODO skip 3.1 and 3.2 pdf
 
+NEWLINE   : ('\n')+ {
+    if self.prevtoken is not None and self.prevtoken.type in {
+        self.ID, self.RPAREN, self.RBRACKET, self.RBRACE,
+        self.INT_DEC, self.INT_BIN, self.INT_OCT, self.INT_HEX,
+        self.FLOAT_LIT, self.TRUE, self.FALSE, self.STRING_LIT,
+        self.RETURN, self.CONTINUE, self.BREAK,
+        self.INT, self.FLOAT, self.BOOLEAN, self.STRING, self.NIL
+    }:
+        self.text = ";"
+        self.type = self.SEMICOLON
+        return self.emit()
+        
+    else:
+        self.skip()
+        
+};
+
+WS: [ \t\f\r]+ -> skip; // skip spaces, tabs 
 COMMENTS: '/*' (COMMENTS|.)*? '*/' -> skip;
 COMMENTS_LINE: '//' ~[\r\n]* -> skip;
-NEWLINE   : [\r\n]+;
-WS: [ \t\f\r]+ -> skip; // skip spaces, tabs 
 
 //TODO ERROR pdf BTL1 + lexererr.py
 ERROR_CHAR: . {raise ErrorToken(self.text)};
