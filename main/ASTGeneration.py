@@ -679,7 +679,6 @@ class ASTGeneration(MiniGoVisitor):
         else:
             return [method, []]
 
-
     # Visit a parse tree produced by MiniGoParser#func_call_thamso.
     def visitFunc_call_thamso(self, ctx:MiniGoParser.Func_call_thamsoContext):
         if ctx.func_call_thamso():
