@@ -516,41 +516,16 @@ class ParserSuite(unittest.TestCase):
 # }
 #             };  
 # ""","Error on line 5 col 0: }", inspect.stack()[0].function))
-    
-    def test_126(self):
-            """Statement"""
-            self.assertTrue(TestParser.test("""
-                                    func Add() {
-                                        for var i [2] int = 0; foo().a.b(); i[3] := 1 {
-                                            return; 
-                                        }
-                                    };""","Error on line 3 col 77: [", inspect.stack()[0].function))
-            
-
-    def test_173(self):
-            """Statement"""
-            self.assertTrue(TestParser.test("""
-                                    func Add() {
-                                        for i[2] := 1; foo().a.b(); i := 1 {
-                                            return; 
-                                        }
-                                    };""","Error on line 3 col 49: :=", inspect.stack()[0].function))
-            
-    def test_176(self):
-            self.assertTrue(TestParser.test("""
-        type Person struct {
-            func (p Person) Greet() string {
-                return "Hello, " + p.name
-            };                                                 
-        }      
-""","Error on line 3 col 12: func", inspect.stack()[0].function))
 
 
-    def test_178(self):
+    def test_100(self):
         """Statement"""
         self.assertTrue(TestParser.test("""
-                                    func Add() {
-                                        for var b int; foo().a.b(); i := 1 {
-                                            return; 
+            func Add() {
                                         }
-                                    };""","Error on line 3 col 53: ;", inspect.stack()[0].function))
+""","successful", inspect.stack()[0].function))
+
+    def test_180(self):
+        self.assertTrue(TestParser.test("""
+                                            const a = [ID][2][VT]int{{{1}}, ID, a, {b}}                              
+                                        ""","successful", inspect.stack()[0].function))

@@ -61,8 +61,7 @@ local_constant: CONST ID ASSIGN (expr);
 function: FUNC func_call_str (type_data | ) LBRACE  body_func  RBRACE SEMICOLON; //sua day
 data_func: (ID type_data) COMMA data_func | (ID type_data);
 body_func: ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
-                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON)) body_func | ((assignment_func | if_else | (RETURN (func_call | expr | )) | local_variable | local_constant | for_basic | for_icu | for_range
-                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON)); //sua day
+                | func_call | call_statement | BREAK | CONTINUE) (SEMICOLON)) body_func | ; //sua day
 
 assignment_func: (dot)
              (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
@@ -92,9 +91,9 @@ func_call_thamso_str: (ID (type_data | )) COMMA func_call_thamso_str | (ID type_
 
 array_literal: type_array list_expr;
 type_array: list_type_arr (type_data);
-list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX) RBRACKET);
+list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX | ID) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX | ID) RBRACKET);
 list_expr: LBRACE data_list_expr RBRACE;
-data_list_expr: (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr) COMMA data_list_expr | (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr); //sua day
+data_list_expr: (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr | ID) COMMA data_list_expr | (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr | ID); //sua day
 type_data: ID | INT | FLOAT | BOOLEAN | STRING | type_array;
 
 struct_literal: ID LBRACE (list_elements | ) RBRACE;
@@ -187,11 +186,10 @@ ID: [a-zA-Z_][a-zA-Z0-9_]*;
 FLOAT_LIT: [0]* INT_DEC DOT [0-9]* ([eE][+-]? [0]* INT_DEC)?;
 //INTEGER_LIT: INT_DEC | INT_BIN | INT_OCT | INT_HEX;
 INT_DEC: ([0-9] | [1-9][0-9]+);
-INT_BIN: [0] [bB] [0-1]+;
-INT_OCT: [0] [oO] [0-7]+;
-INT_HEX: [0] [xX] [0-9a-fA-F]+;
-STRING_LIT: '"' STR_CHAR* '"'{
-    self.text = self.text[1:-1]};
+INT_BIN: [0] [bB] [0-1]+ ;
+INT_OCT: [0] [oO] [0-7]+ ;
+INT_HEX: [0] [xX] [0-9a-fA-F]+ ;
+STRING_LIT: '"' STR_CHAR* '"';
 fragment STR_CHAR: ESC_SEQ | ~[\r\n\\"];
 fragment ESC_SEQ: '\\' [trn"\\];
 
