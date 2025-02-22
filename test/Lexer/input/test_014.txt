@@ -1,2 +1,1 @@
- 
-            const a = 2;
+else for return func type struct interface string int float boolean const var continue break range nil true false

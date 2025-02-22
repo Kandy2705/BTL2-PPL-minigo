@@ -1,3 +1,5 @@
+// 2212009
+
 grammar MiniGo;
 
 @lexer::header {
@@ -30,11 +32,13 @@ options{
 	language = Python3;
 }
 
-program: (list_declaration)+ EOF; // day
+program: list_declaration EOF; // day
 
 list_declaration: (array_literal | global_variable
              | global_constant | function | struct_type
-            | interface_type | struct_func) ;
+            | interface_type | struct_func) list_declaration | (array_literal | global_variable
+             | global_constant | function | struct_type
+            | interface_type | struct_func);
 
 // program: NEWLINE* func_call_thamso EOF;
 
@@ -87,13 +91,13 @@ var_for: VAR ID ((type_data ((ASSIGN (expr)))) | (ASSIGN (expr)));
 struct_func: FUNC LPAREN method RPAREN func_call_str (type_data | ) LBRACE body_func RBRACE SEMICOLON;
 method: (ID ID) COMMA method | (ID ID); //sua day
 func_call_str: ID LPAREN (func_call_thamso_str |  ) RPAREN;
-func_call_thamso_str: (ID (type_data | )) COMMA func_call_thamso_str | (ID type_data); //sua day
+func_call_thamso_str: (data_inter_thamso type_data) COMMA func_call_thamso_str | (data_inter_thamso type_data); //sua day
 
 array_literal: type_array list_expr;
 type_array: list_type_arr (type_data);
 list_type_arr: (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX | ID) RBRACKET) list_type_arr | (LBRACKET (INT_DEC | INT_BIN | INT_OCT | INT_HEX | ID) RBRACKET);
 list_expr: LBRACE data_list_expr RBRACE;
-data_list_expr: (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr | ID) COMMA data_list_expr | (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | ID LBRACE (data_list_expr | ) RBRACE | list_expr | ID); //sua day
+data_list_expr: (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | struct_literal | list_expr | ID) COMMA data_list_expr | (TRUE | FALSE | NIL | FLOAT_LIT | INT_DEC | INT_BIN | INT_OCT | INT_HEX | STRING_LIT | struct_literal | list_expr | ID); //sua day
 type_data: ID | INT | FLOAT | BOOLEAN | STRING | type_array;
 
 struct_literal: ID LBRACE (list_elements | ) RBRACE;
@@ -223,12 +227,10 @@ COMMENTS_LINE: '//' ~[\r\n]* -> skip;
 //ERROR
 ERROR_CHAR: . {raise ErrorToken(self.text)};
 
-UNCLOSE_STRING: '"' STR_CHAR* ('\r' | '\n' | EOF) {
+UNCLOSE_STRING: '"' STR_CHAR* ('\r\n' | '\n' | EOF) {
     if(len(self.text) >= 2 and self.text[-1] == '\n' and self.text[-2] == '\r'):
         raise UncloseString(self.text[0:-2])
     elif (self.text[-1] == '\n'):
-        raise UncloseString(self.text[0:-1])
-    elif (self.text[-1] == '\r'):
         raise UncloseString(self.text[0:-1])
     else:
         raise UncloseString(self.text[0:])
