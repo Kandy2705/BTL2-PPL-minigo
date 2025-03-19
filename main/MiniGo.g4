@@ -71,8 +71,6 @@ assignment_func: (dot)
              (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
              expr));
 dot: dot (DOT ID | LBRACKET expr RBRACKET) | ID;          
-list_arr_index: arr_index list_arr_index | arr_index;
-arr_index: LBRACKET expr RBRACKET;
 assignment_for: ID (((COLONASSIGN | EQ | ADD_ASSIGN | SUB_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN)
              expr));
 
